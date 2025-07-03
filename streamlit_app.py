@@ -86,7 +86,7 @@ def main():
                             st.divider()
         
         # Chat input
-    if prompt := st.chat_input("Ask a question about your PDFs..."):
+if prompt := st.chat_input("Ask a question about your PDFs..."):
             # Add user message
             st.session_state.messages.append({"role": "user", "content": prompt})
             
