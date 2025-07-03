@@ -139,8 +139,8 @@ class VectorStore:
 class LLMClient:
     """Handles interaction with local LLM via Ollama"""
 
-    def __init__(self, model_name: str = "llama3", base_url: str = "http://localhost:11434"):
-        self.model_name = "llama3"  # ✅ FORCE IT. DO NOT USE os.getenv
+    def __init__(self, base_url: str = "http://localhost:11434"):
+        self.model_name = "llama3:latest"  # ✅ Exact match from `ollama list`
         self.base_url = base_url
 
     def generate_answer(self, query: str, context_chunks: List[Dict]) -> str:
@@ -170,12 +170,12 @@ Answer:"""
             )
 
             if response.status_code == 200:
-                return response.json()['response']
+                return response.json().get("response", "⚠️ No response received.")
             else:
-                return f"❌ Ollama responded with status code: {response.status_code} — Model may not exist or be running."
+                return f"❌ Ollama responded with status {response.status_code}. Model name likely wrong: {self.model_name}"
 
         except requests.exceptions.RequestException as e:
-            return f"❌ Could not connect to Ollama: {str(e)}"
+            return f"❌ Ollama connection failed: {str(e)}"
 
 
 
