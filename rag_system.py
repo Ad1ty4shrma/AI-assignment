@@ -139,7 +139,7 @@ class VectorStore:
 class LLMClient:
     """Handles interaction with local LLM via Ollama"""
 
-    def __init__(self, base_url: str = "http://localhost:11434"):
+    def __init__(self, base_url: str = "http://127.0.0.1:11434"):
         self.model_name = "llama3:latest"  # ✅ Exact match from `ollama list`
         self.base_url = base_url
 
