@@ -1,38 +1,29 @@
-def handle_prompt(prompt, rag):
-    # Add user message
-    st.session_state.messages.append({"role": "user", "content": prompt})
+import streamlit as st
+import os
+import tempfile
+from rag_system import RAGSystem
 
-    with st.chat_message("user"):
-        st.write(prompt)
+# Page config
+st.set_page_config(
+    page_title="PDF RAG System",
+    page_icon="📚",
+    layout="wide"
+)
 
-    # Generate response
-    with st.chat_message("assistant"):
-        with st.spinner("Thinking..."):
-            result = rag.query(prompt)
-            st.write(result['answer'])
-
-            if result['sources']:
-                with st.expander("📚 Sources"):
-                    for i, source in enumerate(result['sources'][:3], 1):
-                        st.write(f"**{i}. {source['source']}** (Page {source['page_num']})")
-                        st.write(f"Similarity: {source['similarity_score']:.3f}")
-                        st.write(f"*{source['text'][:200]}...*")
-                        st.divider()
-
-    # Save assistant message
-    st.session_state.messages.append({
-        "role": "assistant",
-        "content": result['answer'],
-        "sources": result['sources']
-    })
+@st.cache_resource
+def load_rag_system():
+    """Load the RAG system (cached to avoid reloading)"""
+    return RAGSystem()
 
 
 def main():
     st.title("📚 PDF RAG System")
     st.markdown("Upload PDFs and ask questions about their content using AI!")
 
+    # Initialize RAG system
     rag = load_rag_system()
 
+    # Sidebar: PDF upload and stats
     with st.sidebar:
         st.header("📄 Document Management")
         uploaded_files = st.file_uploader("Upload PDF files", type=['pdf'], accept_multiple_files=True)
@@ -52,6 +43,7 @@ def main():
                         finally:
                             os.unlink(tmp_file_path)
 
+        # System stats
         st.header("📊 System Stats")
         stats = rag.get_stats()
         st.metric("Total Chunks", stats['total_chunks'])
@@ -61,6 +53,7 @@ def main():
             for source in stats['sources']:
                 st.write(f"• {source}")
 
+    # Main content columns
     col1, col2 = st.columns([2, 1])
 
     with col1:
@@ -68,6 +61,7 @@ def main():
         if 'messages' not in st.session_state:
             st.session_state.messages = []
 
+        # Display chat history
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.write(message["content"])
@@ -89,12 +83,12 @@ def main():
         st.subheader("📋 Instructions")
         st.markdown("""
         1. **Upload PDFs** using the sidebar  
-        2. **Process** each PDF by clicking the button  
-        3. **Ask questions** in the chat interface  
-        4. View **sources** for each answer
+        2. **Process** each PDF  
+        3. **Ask questions** below  
+        4. View **sources** with answers  
 
         **Prerequisites:**
-        - Install Ollama: `curl -fsSL https://ollama.ai/install.sh | sh`
+        - Install Ollama: `https://ollama.com/download`
         - Pull model: `ollama pull llama3`
         """)
 
@@ -102,12 +96,34 @@ def main():
             st.session_state.messages = []
             st.rerun()
 
-    return rag  # ✅ return rag so we can use it outside main()
+    return rag
 
 
+# ✅ Run the app and handle chat input outside layout containers
 if __name__ == "__main__":
     rag = main()
 
-    # ✅ ✅ ✅ This is now fully outside layout containers
+    # ✅ ✅ ✅ Fully outside all containers
     if prompt := st.chat_input("Ask a question about your PDFs..."):
-        handle_prompt(prompt, rag)
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.write(prompt)
+
+        with st.chat_message("assistant"):
+            with st.spinner("Thinking..."):
+                result = rag.query(prompt)
+                st.write(result['answer'])
+
+                if result['sources']:
+                    with st.expander("📚 Sources"):
+                        for i, source in enumerate(result['sources'][:3], 1):
+                            st.write(f"**{i}. {source['source']}** (Page {source['page_num']})")
+                            st.write(f"Similarity: {source['similarity_score']:.3f}")
+                            st.write(f"*{source['text'][:200]}...*")
+                            st.divider()
+
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": result['answer'],
+            "sources": result['sources']
+        })
