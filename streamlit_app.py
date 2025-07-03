@@ -84,9 +84,9 @@ def main():
                             st.write(f"Similarity: {source['similarity_score']:.3f}")
                             st.write(f"*{source['text'][:200]}...*")
                             st.divider()
-        
-        # Chat input
-if prompt := st.chat_input("Ask a question about your PDFs..."):
+
+        # ✅ FIXED: Chat input is now correctly indented
+        if prompt := st.chat_input("Ask a question about your PDFs..."):
             # Add user message
             st.session_state.messages.append({"role": "user", "content": prompt})
             
@@ -127,9 +127,9 @@ if prompt := st.chat_input("Ask a question about your PDFs..."):
         # Instructions
         st.subheader("📋 Instructions")
         st.markdown("""
-        1. **Upload PDFs** using the sidebar
-        2. **Process** each PDF by clicking the button
-        3. **Ask questions** in the chat interface
+        1. **Upload PDFs** using the sidebar  
+        2. **Process** each PDF by clicking the button  
+        3. **Ask questions** in the chat interface  
         4. View **sources** for each answer
         
         **Prerequisites:**
