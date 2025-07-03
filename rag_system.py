@@ -160,17 +160,17 @@ Answer:"""
 
         try:
             response = requests.post(
-                f"{self.base_url}/api/generate",
+                f"{self.base_url}/api/chat",
                 json={
                     "model": self.model_name,
-                    "prompt": prompt,
+                    "messages": [{"role": "user", "content": prompt}],
                     "stream": False
                 },
                 timeout=30
             )
 
             if response.status_code == 200:
-                return response.json().get("response", "⚠️ No response received.")
+                return response.json().get("message", {}).get("content", "⚠️ No response message in Ollama response.")
             else:
                 return f"❌ Ollama responded with status {response.status_code}. Model name likely wrong: {self.model_name}"
 
