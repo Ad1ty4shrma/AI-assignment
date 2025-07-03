@@ -1,0 +1,13 @@
+# Core dependencies
+PyMuPDF==1.23.26
+sentence-transformers==2.2.2
+faiss-cpu==1.7.4
+numpy==1.24.3
+requests==2.31.0
+
+# Web interface
+streamlit==1.29.0
+
+# Development and testing
+pytest==7.4.3
+pytest-cov==4.1.0

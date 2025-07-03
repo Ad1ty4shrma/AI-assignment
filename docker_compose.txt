@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  rag-system:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./rag_storage:/app/rag_storage
+      - ./sample_pdfs:/app/sample_pdfs
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - ollama
+    networks:
+      - rag-network
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - rag-network
+
+volumes:
+  ollama_data:
+
+networks:
+  rag-network:
+    driver: bridge
