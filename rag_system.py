@@ -138,8 +138,9 @@ class VectorStore:
 
 class LLMClient:
     def __init__(self, model_name: str = None, base_url: str = "http://localhost:11434"):
-        self.model_name = model_name or os.getenv("OLLAMA_MODEL", "llama3")
+        self.model_name = "llama3"  # 🔥 Force it for now
         self.base_url = base_url
+
 
     def generate_answer(self, query: str, context_chunks: List[Dict]) -> str:
         context = "\n\n".join([
